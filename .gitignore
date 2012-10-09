@@ -13,3 +13,4 @@ web-app/
 *.iws
 *.ipr
 *.iml
+.idea

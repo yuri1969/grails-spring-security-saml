@@ -20,6 +20,7 @@ import test.TestUserRole
 @Mock([TestSamlUser, TestRole, TestUserRole])
 class SpringSamlUserDetailsServiceTest {
 	def credential, nameID, assertion, mockGrailsAplication, testRole
+	def service
 
 	String username = "jackSparrow"
 	Map detailsServiceSettings = [:]
@@ -27,6 +28,7 @@ class SpringSamlUserDetailsServiceTest {
 
 	@Before
 	public void init() {
+		service = new SpringSamlUserDetailsService()
 		mockOutDefaultGrailsApplication()
 		grailsApplication = new DefaultGrailsApplication()
 
