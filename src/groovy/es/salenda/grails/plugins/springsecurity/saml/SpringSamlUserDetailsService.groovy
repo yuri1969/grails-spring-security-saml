@@ -39,7 +39,6 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	Map samlUserGroupToRoleMapping
 	String samlUserGroupAttribute
 	String userDomainClassName
-	def grailsApplication
 
 	public Object loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
 
