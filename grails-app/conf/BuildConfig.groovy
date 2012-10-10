@@ -16,7 +16,7 @@ grails.project.dependency.resolution = {
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
-
+		mavenRepo "https://build.shibboleth.net/nexus/content/repositories/releases"
 		mavenCentral()
 	}
 
@@ -28,12 +28,12 @@ grails.project.dependency.resolution = {
 		compile ('org.opensaml:opensaml:2.4.1') {
 			transitive = false
 		}
-		compile ('org.opensaml:xmltooling:1.3.1') {
+		compile ('org.opensaml:xmltooling:1.3.4') {
 			transitive = false
 		}
 		compile ('org.apache.santuario:xmlsec:1.4.4') {
 			transitive = false
-		}	
+		}
 		compile ('org.bouncycastle:bcprov-jdk15:1.45') {
 			transitive = false
 		}
@@ -50,7 +50,7 @@ grails.project.dependency.resolution = {
 			transitive = false
 		}
 		compile ('ca.juliusdavies:not-yet-commons-ssl:0.3.9') {
-			transitive = false 
+			transitive = false
 		}
     }
 
