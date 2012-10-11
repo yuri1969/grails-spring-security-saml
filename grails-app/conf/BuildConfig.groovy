@@ -21,37 +21,41 @@ grails.project.dependency.resolution = {
 	}
 
     dependencies {
-		build ("org.apache.ivy:ivy:2.2.0") {
-			transitive = false
-		}
-		
-		compile ('org.opensaml:opensaml:2.4.1') {
-			transitive = false
-		}
-		compile ('org.opensaml:xmltooling:1.3.4') {
-			transitive = false
-		}
-		compile ('org.apache.santuario:xmlsec:1.4.4') {
-			transitive = false
-		}
-		compile ('org.bouncycastle:bcprov-jdk15:1.45') {
-			transitive = false
-		}
-		compile ('org.opensaml:openws:1.4.1') {
-			transitive = false
-		}
-		compile('joda-time:joda-time:1.6.2') {
-			transitive = false
-		}
-		compile('commons-httpclient:commons-httpclient:3.1') {
-			transitive = false
-		}
-		compile('org.apache.velocity:velocity:1.7') {
-			transitive = false
-		}
-		compile ('ca.juliusdavies:not-yet-commons-ssl:0.3.9') {
-			transitive = false
-		}
+			build ("org.apache.ivy:ivy:2.2.0") {
+				transitive = false
+			}
+
+			compile ('org.opensaml:opensaml:2.5.3') {
+				transitive = false
+			}
+			compile ('org.opensaml:xmltooling:1.3.4') {
+				transitive = false
+			}
+			compile ('org.apache.santuario:xmlsec:1.4.4') {
+				transitive = false
+			}
+			compile ('org.bouncycastle:bcprov-jdk15:1.45') {
+				transitive = false
+			}
+			compile ('org.opensaml:openws:1.4.4') {
+				transitive = false
+			}
+			compile('joda-time:joda-time:1.6.2') {
+				transitive = false
+			}
+			compile('commons-httpclient:commons-httpclient:3.1') {
+				transitive = false
+			}
+			compile('org.apache.velocity:velocity:1.7') {
+				transitive = false
+			}
+			compile ('ca.juliusdavies:not-yet-commons-ssl:0.3.9') {
+				transitive = false
+			}
+			compile ('org.owasp.esapi:esapi:2.0.1')
+			{
+				transitive = false
+			}
     }
 
     plugins {

@@ -135,7 +135,7 @@ SAML 2.x support for the Spring Security Plugin
 		
 		def idpSelectionPath = conf.saml.entryPoint.idpSelectionPath
 		samlEntryPoint(SAMLEntryPoint) {
-			filterSuffix = conf.auth.loginFormUrl 						// '/saml/login'
+			filterProcessesUrl = conf.auth.loginFormUrl 						// '/saml/login'
 			if (idpSelectionPath) {
 				idpSelectionPath = idpSelectionPath 					// '/index.gsp'
 			}
@@ -147,7 +147,7 @@ SAML 2.x support for the Spring Security Plugin
 		}
 		
 		metadataFilter(MetadataDisplayFilter) {
-			filterSuffix = conf.saml.metadata.url 						// '/saml/metadata'
+			filterProcessesUrl = conf.saml.metadata.url 						// '/saml/metadata'
 		}
 		
 		metadataGenerator(MetadataGenerator)
@@ -229,6 +229,7 @@ SAML 2.x support for the Spring Security Plugin
 		
 		samlAuthenticationProvider(GrailsSAMLAuthenticationProvider) {
 			userDetails = ref('userDetailsService')
+			hokConsumer = ref('webSSOprofileConsumer')
 		}
 		
 		contextProvider(SAMLContextProviderImpl)
