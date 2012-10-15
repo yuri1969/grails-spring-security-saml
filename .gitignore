@@ -14,3 +14,4 @@ web-app/
 *.ipr
 *.iml
 .idea
+/grails-app/conf/mavenInfo.groovy
