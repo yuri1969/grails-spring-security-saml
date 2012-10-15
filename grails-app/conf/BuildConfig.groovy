@@ -17,6 +17,7 @@ grails.project.dependency.resolution = {
 		grailsHome()
 		grailsCentral()
 		mavenRepo "https://build.shibboleth.net/nexus/content/repositories/releases"
+		mavenRepo "https://build.shibboleth.net/nexus/content/groups/public/"
 		mavenCentral()
 	}
 
