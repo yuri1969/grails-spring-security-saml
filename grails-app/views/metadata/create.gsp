@@ -15,10 +15,10 @@
 			<p>
 			    Generates a new metadata for service provider. Output can be used to configure your securityContext.xml descriptor.
 			</p>
-			
+
 			<g:form action="save">
 			    <table>
-			
+
 			        <tr>
 			            <td>Store for the current session:</td>
 			            <td>
@@ -33,7 +33,7 @@
 			                </small>
 			            </td>
 			        </tr>
-		
+
 			        <tr>
 			            <td>Entity ID:</td>
 			            <td>
@@ -67,6 +67,15 @@
 			            </td>
 			        </tr>
 
+					<tr>
+						<td>Include Idp Discovery</td>
+						<td>
+							<g:checkBox name="includeDiscovery" checked="true"/>
+							<br/>
+							<small>If Idp Discovery should be included in the meta data.</small>
+						</td>
+					</tr>
+
 			        <tr>
 			            <td>Security profile:</td>
 			            <td>
@@ -85,7 +94,7 @@
 			            </td>
 			        </tr>
 
-			
+
 			        <tr>
 			            <td>Signing key:</td>
 			            <td>
@@ -112,7 +121,7 @@
 			                <small>Key used to authenticate this instance for SSL/TLS connections.</small>
 			            </td>
 			        </tr>
-						
+
 			        <tr>
 			            <td>Sign metadata:</td>
 			            <td>
@@ -126,7 +135,7 @@
 			            </td>
 			        </tr>
 
-			
+
 			        <tr>
 			            <td>Sign sent AuthNRequests:</td>
 			            <td>
@@ -172,17 +181,17 @@
 			                </select>
 			            </td>
 			        </tr>
-			
+
 			        <tr>
 			            <td colspan="2">
 			                <br/>
 			                <input type="submit" value="Generate metadata"/>
 			            </td>
 			        </tr>
-			        
+
 			    </table>
 			</g:form>
-			
+
 		</div>
 	</body>
 </html>		

@@ -14,24 +14,19 @@
  */
 package es.salenda.grails.plugins.springsecurity.saml
 
-import java.security.KeyStoreException
-
-import org.springframework.security.saml.metadata.ExtendedMetadata
-import org.springframework.security.saml.metadata.ExtendedMetadataDelegate
-import org.springframework.security.saml.metadata.MetadataMemoryProvider
-import org.springframework.security.core.context.SecurityContextHolder
-import org.w3c.dom.Element
 import org.opensaml.Configuration
-import org.opensaml.saml2.metadata.EntityDescriptor
 import org.opensaml.saml2.metadata.provider.MetadataProvider
-import org.opensaml.saml2.metadata.provider.MetadataProviderException
 import org.opensaml.xml.io.Marshaller
 import org.opensaml.xml.io.MarshallerFactory
 import org.opensaml.xml.io.MarshallingException
 import org.opensaml.xml.security.credential.Credential
 import org.opensaml.xml.util.XMLHelper
+import org.springframework.security.saml.metadata.ExtendedMetadata
+import org.springframework.security.saml.metadata.ExtendedMetadataDelegate
+import org.springframework.security.saml.metadata.MetadataMemoryProvider
+import org.w3c.dom.Element
 
-import grails.plugins.springsecurity.Secured
+import java.security.KeyStoreException
 
 /**
  * @author alvaro.sanchez
@@ -43,7 +38,7 @@ class MetadataController {
 	def keyManager
 
 	def index = {
-		[hostedSP: metadata.hostedSPName, spList: metadata.SPEntityNames, idpList:metadata.IDPEntityNames]
+		[hostedSP: metadata.hostedSPName, spList: metadata.SPEntityNames, idpList: metadata.IDPEntityNames]
 	}
 
 	def show = {
@@ -53,7 +48,7 @@ class MetadataController {
 		def serializedMetadata = getMetadataAsString(entityDescriptor)
 
 		[entityDescriptor: entityDescriptor, extendedMetadata: extendedMetadata,
-					storagePath: storagePath, serializedMetadata: serializedMetadata]
+			storagePath: storagePath, serializedMetadata: serializedMetadata]
 	}
 
 	def create = {
@@ -79,10 +74,11 @@ class MetadataController {
 		metadataGenerator.setEncryptionKey(params.encryptionKey)
 		metadataGenerator.setTlsKey(params.tlsKey)
 
+		metadataGenerator.setIncludeDiscovery(params.includeDiscovery as boolean)
+
 		def descriptor = metadataGenerator.generateMetadata()
 
-		def extendedMetadata = new ExtendedMetadata()
-		metadataGenerator.generateExtendedMetadata(extendedMetadata)
+		ExtendedMetadata extendedMetadata = metadataGenerator.generateExtendedMetadata()
 		extendedMetadata.setSecurityProfile(params.securityProfile)
 		extendedMetadata.setRequireLogoutRequestSigned(params.requireLogoutRequestSigned as boolean)
 		extendedMetadata.setRequireLogoutResponseSigned(params.requireLogoutResponseSigned as boolean)
@@ -98,7 +94,7 @@ class MetadataController {
 			metadata.refreshMetadata()
 		}
 
-		redirect(action:'show', params:[entityId: params.entityId])
+		redirect(action: 'show', params: [entityId: params.entityId])
 	}
 
 	protected def getFileName(entityDescriptor) {
