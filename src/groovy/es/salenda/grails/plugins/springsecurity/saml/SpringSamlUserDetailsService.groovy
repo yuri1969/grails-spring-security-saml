@@ -165,7 +165,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			userClazz.withTransaction {
 				def existingUser = userClazz.findWhere(whereClause)
 				if (!existingUser) {
-					user.save()
+					user.save(failOnError:true)
 				} else {
 					user = updateUserProperties(existingUser, user)
 
