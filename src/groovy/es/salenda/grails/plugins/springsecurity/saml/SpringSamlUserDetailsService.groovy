@@ -154,6 +154,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	}
 
 	private void saveUser(userClazz, user, authorities) {
+		println "called save user println"
 	  log.debug "Called Save User: "
 		log.debug user
 
