@@ -154,6 +154,8 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	}
 
 	private void saveUser(userClazz, user, authorities) {
+	  log.debug "Called Save User: "
+		log.debug user
 
 		if (userClazz && samlAutoCreateActive && samlAutoCreateKey 
 				&& authorityNameField && authorityJoinClassName) {
@@ -165,6 +167,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			userClazz.withTransaction {
 				def existingUser = userClazz.findWhere(whereClause)
 				if (!existingUser) {
+					log.debug "No existing user trying to save."
 					user.save(failOnError:true)
 				} else {
 					user = updateUserProperties(existingUser, user)
