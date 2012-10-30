@@ -1,5 +1,6 @@
 security {
 	saml {
+		userAttributeMappings = [:]
 		active = true
 		afterLoginUrl = '/'
 		afterLogoutUrl = '/'
