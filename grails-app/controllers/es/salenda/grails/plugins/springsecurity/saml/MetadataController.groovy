@@ -27,6 +27,7 @@ import org.springframework.security.saml.metadata.MetadataMemoryProvider
 import org.w3c.dom.Element
 
 import java.security.KeyStoreException
+import org.opensaml.common.xml.SAMLConstants
 
 /**
  * @author alvaro.sanchez
@@ -73,6 +74,25 @@ class MetadataController {
 		metadataGenerator.setSigningKey(params.signingKey)
 		metadataGenerator.setEncryptionKey(params.encryptionKey)
 		metadataGenerator.setTlsKey(params.tlsKey)
+
+		def bindingsSSO = []
+
+		if (params.ssoBindingPost as boolean)
+		{
+			bindingsSSO << SAMLConstants.SAML2_POST_BINDING_URI
+		}
+
+		if (params.ssoBindingPAOS as boolean)
+		{
+			bindingsSSO << SAMLConstants.SAML2_PAOS_BINDING_URI
+		}
+
+		if (params.ssoBindingsArtifact as boolean)
+		{
+			bindingsSSO <<  SAMLConstants.SAML2_ARTIFACT_BINDING_URI
+		}
+
+		metadataGenerator.setBindingsSSO((Collection<String>) bindingsSSO)
 
 		metadataGenerator.setIncludeDiscovery(params.includeDiscovery as boolean)
 

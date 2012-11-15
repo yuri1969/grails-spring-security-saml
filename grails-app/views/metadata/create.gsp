@@ -4,8 +4,11 @@
 		<meta name="layout" content="main"/>
 		<title>Metadata</title>
 		<style type="text/css">
-			input {
+			.wide{
 				width: 500px;
+			}
+			td{
+				vertical-align: top;
 			}
 		</style>
 	</head>
@@ -37,7 +40,7 @@
 			        <tr>
 			            <td>Entity ID:</td>
 			            <td>
-			            	<g:textField name="entityId"  value="${entityId}"/>
+			            	<g:textField name="entityId" class="wide" value="${entityId}"/>
 			            	<br/>
 			                <small>Entity ID is a unique identifier for an identity or service provider. Value is included in the
 			                    generated metadata.
@@ -48,7 +51,7 @@
 			        <tr>
 			            <td>Entity base URL:</td>
 			            <td>
-			            	<g:textField name="baseURL" value="${baseUrl }"/>
+			            	<g:textField name="baseURL"  class="wide" value="${baseUrl }"/>
 			            	<br/>
 			                <small>Base to generate URLs for this server. For example: https://myServer:443/saml-app. The public
 			                    address your server will be accessed from should be used here.
@@ -59,7 +62,7 @@
 			        <tr>
 			            <td>Entity alias:</td>
 			            <td>
-			            	<g:textField name="alias" value="${alias}"/>
+			            	<g:textField name="alias"  class="wide" value="${alias}"/>
 			            	<br/>
 			                <small>Alias is an internal mechanism allowing collocating multiple service providers on one server.
 			                    Alias must be unique.
@@ -73,6 +76,16 @@
 							<g:checkBox name="includeDiscovery" checked="true"/>
 							<br/>
 							<small>If Idp Discovery should be included in the meta data.</small>
+						</td>
+					</tr>
+
+					<tr>
+						<td>SSO Bindings</td>
+						<td>
+							<small>Which bindings to use for SSO</small><br/>
+							<g:checkBox name="ssoBindingPost"  checked="true"/> <label for="ssoBindingPost">Post</label><br/>
+							<g:checkBox name="ssoBindingPAOS" checked="true" /> <label for="ssoBindingPAOS">PAOS</label><br/>
+							<g:checkBox name="ssoBindingArtifact" checked="true" /> <label for="ssoBindingArtifact">Artifact</label><br/>
 						</td>
 					</tr>
 
@@ -125,10 +138,7 @@
 			        <tr>
 			            <td>Sign metadata:</td>
 			            <td>
-			                <select name="signMetadata">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="signMetadata" />
 			                <br/>
 			                <small>If true the generated metadata will be digitally signed using the specified signature key.
 			                </small>
@@ -139,46 +149,31 @@
 			        <tr>
 			            <td>Sign sent AuthNRequests:</td>
 			            <td>
-			                <select name="requestSigned">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="requestSigned" />
 			            </td>
 			        </tr>
 			        <tr>
 			            <td>Require signed authentication Assertion:</td>
 			            <td>
-			                <select name="wantAssertionSigned">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="wantAssertionSigned" />
 			            </td>
 			        </tr>
 			        <tr>
 			            <td>Require signed LogoutRequest:</td>
 			            <td>
-			                <select name="requireLogoutRequestSigned">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="requireLogoutRequestSigned" />
 			            </td>
 			        </tr>
 			        <tr>
 			            <td>Require signed LogoutResponse:</td>
 			            <td>
-			                <select name="requireLogoutResponseSigned">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="requireLogoutResponseSigned" />
 			            </td>
 			        </tr>
 			        <tr>
 			            <td>Require signed ArtifactResolve:</td>
 			            <td>
-			                <select name="requireArtifactResolveSigned">
-			                    <option value="true">Yes</option>
-			                    <option value="false">No</option>
-			                </select>
+							<g:checkBox name="requireArtifactResolveSigned" />
 			            </td>
 			        </tr>
 
