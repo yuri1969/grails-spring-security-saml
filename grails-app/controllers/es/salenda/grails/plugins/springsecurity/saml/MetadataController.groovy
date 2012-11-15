@@ -87,7 +87,7 @@ class MetadataController {
 			bindingsSSO << SAMLConstants.SAML2_PAOS_BINDING_URI
 		}
 
-		if (params.ssoBindingsArtifact as boolean)
+		if (params.ssoBindingArtifact as boolean)
 		{
 			bindingsSSO <<  SAMLConstants.SAML2_ARTIFACT_BINDING_URI
 		}
