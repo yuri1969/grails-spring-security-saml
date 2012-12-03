@@ -8,6 +8,7 @@ security {
 		autoCreate {
 			active =  false
 			key = 'username'
+			assignAuthorities = true
 		}
 		metadata {
 			defaultIdp = 'ping'

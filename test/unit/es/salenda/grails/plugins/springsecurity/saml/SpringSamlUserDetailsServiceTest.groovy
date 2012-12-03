@@ -68,7 +68,7 @@ class SpringSamlUserDetailsServiceTest {
 	@Test
 	void "loadUserBySAML should return NameID as the username when no mapping specified"() {
 
-		service.samlUserAttributeMappings = [ username: null ]
+		service.samlUserAttributeMappings = [ : ]
 
 		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": "someotherValue"])
 
@@ -217,6 +217,37 @@ class SpringSamlUserDetailsServiceTest {
 		def userDetail = service.loadUserBySAML(credential)
 		assert removedExistingRoles
 		assert savedNewRoles
+	}
+
+	@Test
+	void "loadUserBySAML should  not update the roles for an existing user"() {
+		assert testRole.save()
+
+		service.samlAutoCreateActive = true
+		service.samlAutoAssignAuthorities = false
+		service.samlAutoCreateKey = 'username'
+
+		setMockSamlAttributes(credential, ["$GROUP_ATTR_NAME": "something=something,CN=myGroup", "$USERNAME_ATTR_NAME": username])
+
+		def user = new TestSamlUser(username: username, password: 'test')
+		assert user.save()
+
+		def removedExistingRoles = false
+		TestUserRole.metaClass.'static'.removeAll = { TestSamlUser userWithRoles ->
+			assert userWithRoles.username == user.username
+			removedExistingRoles = true
+		}
+
+		def savedNewRoles = false
+		TestUserRole.metaClass.'static'.create = { TestSamlUser userWithNoRoles, TestRole role ->
+			assert userWithNoRoles.username == user.username
+			assert role.authority == ROLE
+			savedNewRoles = true
+		}
+
+		def userDetail = service.loadUserBySAML(credential)
+		assert !removedExistingRoles
+		assert !savedNewRoles
 	}
 
     @Test

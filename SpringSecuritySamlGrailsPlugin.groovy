@@ -182,7 +182,8 @@ SAML 2.x support for the Spring Security Plugin
 					spMetadataProviderBean.constructorArgs = [spResource.getFile()]
 					parserPool = ref('parserPool')
 				}
-				
+
+				//TODO consider adding idp discovery default
 				spMetadataDefaults(ExtendedMetadata) { extMetadata ->
 					local = defaultSpConfig."local"
 					alias = defaultSpConfig."alias"
@@ -220,6 +221,7 @@ SAML 2.x support for the Spring Security Plugin
 			authorityJoinClassName = conf.userLookup.authorityJoinClassName
 			authorityNameField = conf.authority.nameField
 			samlAutoCreateActive = conf.saml.autoCreate.active
+			samlAutoAssignAuthorities = conf.saml.autoCreate.assignAuthorities
 			samlAutoCreateKey = conf.saml.autoCreate.key
 			samlUserAttributeMappings = conf.saml.userAttributeMappings
 			samlUserGroupAttribute = conf.saml.userGroupAttribute

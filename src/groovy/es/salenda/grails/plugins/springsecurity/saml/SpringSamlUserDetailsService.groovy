@@ -25,7 +25,7 @@ import org.springframework.security.saml.userdetails.SAMLUserDetailsService
 /**
  * A {@link GormUserDetailsService} extension to read attributes from a LDAP-backed 
  * SAML identity provider. It also reads roles from database
- * 
+ *
  * @author alvaro.sanchez
  */
 class SpringSamlUserDetailsService extends GormUserDetailsService implements SAMLUserDetailsService {
@@ -34,6 +34,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	String authorityJoinClassName
 	String authorityNameField
 	Boolean samlAutoCreateActive
+	Boolean samlAutoAssignAuthorities = true
 	String samlAutoCreateKey
 	Map samlUserAttributeMappings
 	Map samlUserGroupToRoleMapping
@@ -53,7 +54,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			if (user) {
 				log.debug "Loading database roles for $username..."
 				def authorities = getAuthoritiesForUser(credential)
-				saveUser(user.class, user, authorities)
+				saveUser(user.class, user, authorities)      //TODO consider returning the saved user and passing that on to createuserdetails
 				createUserDetails(user, authorities)
 			} else {
 				throw new InstantiationException('could not instantiate new user')
@@ -73,7 +74,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			return credential.nameID?.value
 		}
 	}
-	
+
 	protected Object mapAdditionalAttributes(credential, user) {
 		samlUserAttributeMappings.each { key, value ->
 			def attribute = credential.getAttributeByName(value)
@@ -106,9 +107,9 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	 * Extract the groups that the user is a member of from the saml assertion.
 	 * Expects the saml.userGroupAttribute to specify the saml assertion attribute that holds 
 	 * returned group membership data.
-	 * 
+	 *
 	 * Expects the group strings to be of the format "CN=groupName,someOtherParam=someOtherValue"
-	 * 
+	 *
 	 * @param credential
 	 * @return list of groups
 	 */
@@ -158,9 +159,9 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	  log.debug "Called Save User: "
 		log.debug user
 
-		if (userClazz && samlAutoCreateActive && samlAutoCreateKey 
+		if (userClazz && samlAutoCreateActive && samlAutoCreateKey
 				&& authorityNameField && authorityJoinClassName) {
-			
+
 			Map whereClause = [:]
 			whereClause.put "$samlAutoCreateKey".toString(), user."$samlAutoCreateKey"
 			Class<?> joinClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
@@ -171,14 +172,17 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					log.debug "No existing user trying to save."
 					user.save(failOnError:true)
 				} else {
-					user = updateUserProperties(existingUser, user)
+					user = updateUserProperties(existingUser, user) //This just sets user to the updated version not update the object leaving it hanging.
 
-					joinClass.removeAll user
+					if(samlAutoAssignAuthorities) {
+						joinClass.removeAll user
+					}
 				}
-
-				authorities.each { grantedAuthority ->
-					def role = getRole(grantedAuthority."${authorityNameField}")
-					joinClass.create(user, role)
+				if(samlAutoAssignAuthorities) {
+					authorities.each { grantedAuthority ->
+						def role = getRole(grantedAuthority."${authorityNameField}")
+						joinClass.create(user, role)
+					}
 				}
 			}
 		}
@@ -190,13 +194,13 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
         }
         return existingUser
     }
-	
+
 	private Object getRole(String authority) {
 		if (authority && authorityNameField && authorityClassName) {
 			Class<?> Role = grailsApplication.getDomainClass(authorityClassName).clazz
 			if ( Role ) {
 				Map whereClause = [:]
-				whereClause.put "$authorityNameField".toString(), authority 
+				whereClause.put "$authorityNameField".toString(), authority
 				Role.findWhere(whereClause)
 			} else {
 				throw new ClassNotFoundException("domain class ${authorityClassName} not found")

@@ -60,7 +60,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":tomcat:$grailsVersion",
+			test ":spock:0.7"
+			build(":tomcat:$grailsVersion",
               ":hibernate:$grailsVersion") {
             export = false
         }
