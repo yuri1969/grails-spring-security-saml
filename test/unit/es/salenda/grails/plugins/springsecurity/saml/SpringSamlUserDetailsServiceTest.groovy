@@ -1,25 +1,26 @@
 package es.salenda.grails.plugins.springsecurity.saml
 
-import static es.salenda.grails.plugins.springsecurity.saml.UnitTestUtils.*
-import grails.test.mixin.*
-
-import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser
+
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.junit.Before
 import org.junit.Test
 import org.opensaml.saml2.core.impl.AssertionImpl
 import org.opensaml.saml2.core.impl.NameIDImpl
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.security.saml.*
-
+import org.springframework.security.saml.SAMLCredential
 import test.TestRole
 import test.TestSamlUser
 import test.TestUserRole
 
+import static es.salenda.grails.plugins.springsecurity.saml.UnitTestUtils.*
+
 @TestFor(SpringSamlUserDetailsService)
 @Mock([TestSamlUser, TestRole, TestUserRole])
 class SpringSamlUserDetailsServiceTest {
-	def credential, nameID, assertion, mockGrailsAplication, testRole
+	def credential, nameID, assertion, mockGrailsAplication, testRole, testRole2
 	def service
 
 	String username = "jackSparrow"
@@ -40,7 +41,7 @@ class SpringSamlUserDetailsServiceTest {
 		service.authorityNameField = "authority"
 		service.samlAutoCreateActive = false
 		service.samlAutoCreateKey = null
-		service.samlUserAttributeMappings = [ username: USERNAME_ATTR_NAME ]
+		service.samlUserAttributeMappings = [username: USERNAME_ATTR_NAME]
 		service.samlUserGroupAttribute = GROUP_ATTR_NAME
 		service.samlUserGroupToRoleMapping = ['myGroup': ROLE]
 		service.userDomainClassName = USER_CLASS_NAME
@@ -48,12 +49,13 @@ class SpringSamlUserDetailsServiceTest {
 
 		nameID = new NameIDImpl("", "", "")
 		assertion = new AssertionImpl("", "", "")
-		
+
 		// This is what a SamlResponse will eventually be marshalled to
 		credential = new SAMLCredential(nameID, assertion, null, null)
 		credential.metaClass.getNameID = { [value: "$username"] }
 
 		testRole = new TestRole(authority: ROLE)
+		testRole2 = new TestRole(authority: "FAKEROLE2")
 
 		// set default username to be returned in the saml response
 		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username])
@@ -68,7 +70,7 @@ class SpringSamlUserDetailsServiceTest {
 	@Test
 	void "loadUserBySAML should return NameID as the username when no mapping specified"() {
 
-		service.samlUserAttributeMappings = [ : ]
+		service.samlUserAttributeMappings = [:]
 
 		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": "someotherValue"])
 
@@ -83,7 +85,7 @@ class SpringSamlUserDetailsServiceTest {
 
 		assert user.username == username
 	}
-	
+
 	@Test
 	void "loadUserBySAML should raise an exception if username not supplied in saml response"() {
 
@@ -133,23 +135,23 @@ class SpringSamlUserDetailsServiceTest {
 		assert TestSamlUser.count() == 1
 		assert TestSamlUser.findByUsername(userDetails.username)
 	}
-	
+
 	@Test
 	void "loadUserBySAML should set additional mapped attributes on the user"() {
 		def emailAddress = "test@mailinator.com"
 		def firstname = "Jack"
 		service.samlAutoCreateActive = true
 		service.samlAutoCreateKey = 'username'
-		
-		service.samlUserAttributeMappings = [ email: "$MAIL_ATTR_NAME", firstName: "$FIRSTNAME_ATTR_NAME" ]
-		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress, "$FIRSTNAME_ATTR_NAME":firstname])
+
+		service.samlUserAttributeMappings = [email: "$MAIL_ATTR_NAME", firstName: "$FIRSTNAME_ATTR_NAME"]
+		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress, "$FIRSTNAME_ATTR_NAME": firstname])
 
 		def user = service.loadUserBySAML(credential)
 		def samlUser = TestSamlUser.findByUsername(username)
 		assert samlUser.email == emailAddress
 		assert samlUser.firstName == firstname
 	}
-	
+
 
 	@Test
 	void "loadUserBySAML should not persist a user that already exists"() {
@@ -250,45 +252,90 @@ class SpringSamlUserDetailsServiceTest {
 		assert !savedNewRoles
 	}
 
-    @Test
-    void "loadUserBySAML should set any mapped fields for a user"() {
-        def emailAddress = "test@mailinator.com"
-        def firstname = "Jack"
+	@Test
+	void "loadUserBySAML should still pull details from DB"() {
+		assert testRole.save()
+		assert testRole2.save()
 
-        service.samlAutoCreateActive = true
-        service.samlAutoCreateKey = 'username'
-        service.samlUserAttributeMappings = [ email: "$MAIL_ATTR_NAME", firstName: "$FIRSTNAME_ATTR_NAME" ]
-        setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress, "$FIRSTNAME_ATTR_NAME":firstname])
 
-        def user = new TestSamlUser(username: username, password: 'test')
-        assert user.save()
 
-        TestUserRole.metaClass.'static'.removeAll = {TestSamlUser samlUser -> }
+		service.samlAutoCreateActive = true
+		service.samlAutoAssignAuthorities = false
+		service.samlAutoCreateKey = 'username'
 
-        service.loadUserBySAML(credential)
+		setMockSamlAttributes(credential, ["$GROUP_ATTR_NAME": "something=something,CN=myGroup", "$USERNAME_ATTR_NAME": username])
 
-        def updatedUser = TestSamlUser.findByUsername(username)
-        assert updatedUser.email == emailAddress
-        assert updatedUser.firstName == firstname
-    }
+		def user = new TestSamlUser(username: username, password: 'test')
+		assert user.save()
 
-    @Test
-    void "loadUserBySAML should update mapped fields for a user"() {
-        def intialEmail = 'myfirstmail@mailinator.com'
-        def emailAddress = "test@mailinator.com"
+		TestUserRole.create(user,testRole2)
 
-        service.samlAutoCreateActive = true
-        service.samlAutoCreateKey = 'username'
-        service.samlUserAttributeMappings = [ email: "$MAIL_ATTR_NAME"]
-        setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress])
-        TestUserRole.metaClass.'static'.removeAll = {TestSamlUser samlUser -> }
 
-        def user = new TestSamlUser(username: username, password: 'test', email: intialEmail)
-        assert user.save()
+		def removedExistingRoles = false
+		TestUserRole.metaClass.'static'.removeAll = { TestSamlUser userWithRoles ->
+			assert userWithRoles.username == user.username
+			removedExistingRoles = true
+		}
 
-        service.loadUserBySAML(credential)
+		def savedNewRoles = false
+		TestUserRole.metaClass.'static'.create = { TestSamlUser userWithNoRoles, TestRole role ->
+			assert userWithNoRoles.username == user.username
+			assert role.authority == ROLE
+			savedNewRoles = true
+		}
 
-        def updatedUser = TestSamlUser.findByUsername(username)
-        assert updatedUser.email == emailAddress
-    }
+		def userDetail = service.loadUserBySAML(credential)
+		assert !removedExistingRoles
+		assert !savedNewRoles
+
+		Set authorities = userDetail.getAuthorities()
+
+		assert authorities.size() == 1
+		assert authorities.iterator().next().authority == testRole2.authority
+
+	}
+
+
+
+	@Test
+	void "loadUserBySAML should set any mapped fields for a user"() {
+		def emailAddress = "test@mailinator.com"
+		def firstname = "Jack"
+
+		service.samlAutoCreateActive = true
+		service.samlAutoCreateKey = 'username'
+		service.samlUserAttributeMappings = [email: "$MAIL_ATTR_NAME", firstName: "$FIRSTNAME_ATTR_NAME"]
+		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress, "$FIRSTNAME_ATTR_NAME": firstname])
+
+		def user = new TestSamlUser(username: username, password: 'test')
+		assert user.save()
+
+		TestUserRole.metaClass.'static'.removeAll = {TestSamlUser samlUser -> }
+
+		service.loadUserBySAML(credential)
+
+		def updatedUser = TestSamlUser.findByUsername(username)
+		assert updatedUser.email == emailAddress
+		assert updatedUser.firstName == firstname
+	}
+
+	@Test
+	void "loadUserBySAML should update mapped fields for a user"() {
+		def intialEmail = 'myfirstmail@mailinator.com'
+		def emailAddress = "test@mailinator.com"
+
+		service.samlAutoCreateActive = true
+		service.samlAutoCreateKey = 'username'
+		service.samlUserAttributeMappings = [email: "$MAIL_ATTR_NAME"]
+		setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username, "$MAIL_ATTR_NAME": emailAddress])
+		TestUserRole.metaClass.'static'.removeAll = {TestSamlUser samlUser -> }
+
+		def user = new TestSamlUser(username: username, password: 'test', email: intialEmail)
+		assert user.save()
+
+		service.loadUserBySAML(credential)
+
+		def updatedUser = TestSamlUser.findByUsername(username)
+		assert updatedUser.email == emailAddress
+	}
 }
