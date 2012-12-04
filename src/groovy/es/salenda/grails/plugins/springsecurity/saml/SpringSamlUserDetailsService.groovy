@@ -57,8 +57,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 				def grantedAuthorities = []
 				if (samlAutoCreateActive) {
-					user = saveUser(user.class, user, authorities)
-					user.attach()
+					user = saveUser(user.class, user, authorities).merge()
 					user.getAuthorities().each { authority ->
 						grantedAuthorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))
 
@@ -189,6 +188,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					if (samlAutoAssignAuthorities) {
 						joinClass.removeAll user
 					}
+					user.save()
 				}
 				if (samlAutoAssignAuthorities) {
 					authorities.each { grantedAuthority ->
