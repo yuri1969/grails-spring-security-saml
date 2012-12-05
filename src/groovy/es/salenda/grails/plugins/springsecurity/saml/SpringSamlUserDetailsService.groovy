@@ -64,7 +64,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					whereClause.put "user", user
 					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
 					UserRoleClass.withTransaction {
-						def auths = UserRoleClass.findWhere(whereClause).collect { it.role }
+						def auths = UserRoleClass.findAllWhere(whereClause).collect { it.role }
 
 						auths.each { authority ->
 							grantedAuthorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))
