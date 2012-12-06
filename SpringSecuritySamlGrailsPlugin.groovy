@@ -267,7 +267,9 @@ SAML 2.x support for the Spring Security Plugin
 		samlLogoutProcessingFilter(SAMLLogoutProcessingFilter, 
 			ref('successLogoutHandler'), ref('logoutHandler'))
 		
-		webSSOprofileConsumer(WebSSOProfileConsumerImpl)
+		webSSOprofileConsumer(WebSSOProfileConsumerImpl){
+			responseSkew = 300
+		}
 		
 		webSSOprofile(WebSSOProfileImpl)
 		
