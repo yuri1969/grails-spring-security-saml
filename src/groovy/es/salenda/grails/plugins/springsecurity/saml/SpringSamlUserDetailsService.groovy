@@ -33,6 +33,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	String authorityClassName
 	String authorityJoinClassName
 	String authorityNameField
+	String authoritiesPropertyName
 	Boolean samlAutoCreateActive
 	Boolean samlAutoAssignAuthorities = true
 	String samlAutoCreateKey
@@ -60,11 +61,11 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					user = saveUser(user.class, user, authorities)
 
 					//TODO move to function
-					Map whereClause = [:]
-					whereClause.put "user", user
-					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
-					UserRoleClass.withTransaction {
-						def auths = UserRoleClass.findAllWhere(whereClause).collect { it.role }
+//					Map whereClause = [:]
+//					whereClause.put "user", user
+//					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
+					user.withTransaction {
+						def auths = user."$authoritiesPropertyName"
 
 						auths.each { authority ->
 							grantedAuthorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))

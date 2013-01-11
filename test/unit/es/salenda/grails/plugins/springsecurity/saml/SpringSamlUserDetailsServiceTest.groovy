@@ -45,6 +45,7 @@ class SpringSamlUserDetailsServiceTest {
 		service.samlUserGroupAttribute = GROUP_ATTR_NAME
 		service.samlUserGroupToRoleMapping = ['myGroup': ROLE]
 		service.userDomainClassName = USER_CLASS_NAME
+		service.authoritiesPropertyName = AUTHORITIES_PROPERTY_NAME
 		service.grailsApplication = grailsApplication
 
 		nameID = new NameIDImpl("", "", "")

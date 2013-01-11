@@ -23,7 +23,7 @@ class SpringSamlUserDetailsServiceSpec extends IntegrationSpec {
 			TestSamlUser user = TestSamlUser.build([username:username,email:'bob@fake.com'])
 			TestRole role = TestRole.build(authority:"testauth")
 			TestUserRole userRole = TestUserRole.build(user:user,role:role)
-			SpringSamlUserDetailsService service = new SpringSamlUserDetailsService(samlAutoAssignAuthorities: false,samlAutoCreateActive: true,userDomainClassName: "test.TestSamlUser",samlAutoCreateKey: 'username',authorityNameField: 'authority',authorityJoinClassName: 'test.TestUserRole')
+			SpringSamlUserDetailsService service = new SpringSamlUserDetailsService(samlAutoAssignAuthorities: false,samlAutoCreateActive: true,userDomainClassName: "test.TestSamlUser",samlAutoCreateKey: 'username',authorityNameField: 'authority',authorityJoinClassName: 'test.TestUserRole', authoritiesPropertyName:'authorities')
 			service.grailsApplication = grailsApplication
 		  def loadedUser
 		when:
