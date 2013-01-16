@@ -88,7 +88,14 @@
 							<g:checkBox name="ssoBindingArtifact" checked="true" /> <label for="ssoBindingArtifact">Artifact</label><br/>
 						</td>
 					</tr>
-
+					<tr>
+						<td>HoK SSO Bindings</td>
+						<td>
+							<small>Which bindings to use for HoK SSO</small><br/>
+							<g:checkBox name="hokBindingPost"  checked="true"/> <label for="hokBindingPost">Post</label><br/>
+							<g:checkBox name="hokBindingArtifact" checked="true" /> <label for="hokBindingArtifact">Artifact</label><br/>
+						</td>
+					</tr
 			        <tr>
 			            <td>Security profile:</td>
 			            <td>

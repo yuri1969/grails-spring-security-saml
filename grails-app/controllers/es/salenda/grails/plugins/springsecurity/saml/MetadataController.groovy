@@ -75,6 +75,8 @@ class MetadataController {
 		metadataGenerator.setEncryptionKey(params.encryptionKey)
 		metadataGenerator.setTlsKey(params.tlsKey)
 
+
+		//<editor-fold desc="SSO Bindings">
 		def bindingsSSO = []
 
 		if (params.ssoBindingPost as boolean)
@@ -93,6 +95,25 @@ class MetadataController {
 		}
 
 		metadataGenerator.setBindingsSSO((Collection<String>) bindingsSSO)
+		//</editor-fold>
+
+
+
+		//<editor-fold desc="HoK SSO Bindings">
+		def bindingsHoKSSO = []
+
+		if (params.hokBindingPost)
+		{
+			bindingsHoKSSO << SAMLConstants.SAML2_POST_BINDING_URI
+		}
+
+		if (params.hokBindingArtifact)
+		{
+			bindingsHoKSSO << SAMLConstants.SAML2_ARTIFACT_BINDING_URI
+		}
+
+		metadataGenerator.setBindingsHoKSSO(bindingsHoKSSO)
+		//</editor-fold>
 
 		metadataGenerator.setIncludeDiscovery(params.includeDiscovery as boolean)
 
