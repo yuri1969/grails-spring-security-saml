@@ -227,6 +227,8 @@ SAML 2.x support for the Spring Security Plugin
 			samlUserGroupAttribute = conf.saml.userGroupAttribute
 			samlUserGroupToRoleMapping = conf.saml.userGroupToRoleMapping
 			userDomainClassName = conf.userLookup.userDomainClassName
+			authoritiesPropertyName = conf.userLookup.authoritiesPropertyName
+
 		}
 		
 		samlAuthenticationProvider(GrailsSAMLAuthenticationProvider) {
