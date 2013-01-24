@@ -65,6 +65,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 //					whereClause.put "user", user
 //					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
 					user.withTransaction {
+
 						def auths = user."$authoritiesPropertyName"
 
 						auths.each { authority ->
@@ -160,7 +161,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		userGroups
 	}
 
-	private Object generateSecurityUser(username) {
+	protected Object generateSecurityUser(username) {
 		if (userDomainClassName) {
 			Class<?> UserClass = grailsApplication.getDomainClass(userDomainClassName)?.clazz
 			if (UserClass) {
@@ -176,7 +177,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		}
 	}
 
-	private def saveUser(userClazz, user, authorities) {
+	protected def saveUser(userClazz, user, authorities) {
 		println "called save user println"
 		log.debug "Called Save User: "
 		log.debug user
