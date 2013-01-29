@@ -60,6 +60,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+			compile ":codenarc:0.18"
 			test ":spock:0.7"
 			test ":code-coverage:1.2.5"
 			compile ":build-test-data:2.0.3"
@@ -87,9 +88,23 @@ else {
 
 
 
+//<editor-fold desc="CodeNarc Settings">
+codenarc.processTestUnit = false
+codenarc.processTestIntegration = false
+
+codenarc.propertiesFile = 'grails-app/conf/codenarc.properties'
+codenarc.ruleSetFiles = "rulesets/basic.xml,rulesets/exceptions.xml, rulesets/imports.xml,rulesets/grails.xml, rulesets/unused.xml, rulesets/concurrency.xml,rulesets/convention.xml,rulesets/design.xml,rulesets/groovyism.xml,rulesets/imports.xml,rulesets/logging.xml"
+
 codenarc.reports = {
-	CodeNarcReport('xml') {
-		outputFile = 'target/test-reports/CodeNarcReport.xml'
-		title = 'CodeNarc Report'
+	MyXmlReport('xml') {
+		// The report name "MyXmlReport" is user-defined; Report type is 'xml'
+		outputFile = 'target/test-reports/CodeNarcReport.xml' // Set the 'outputFile' property of the (XML) Report
+		title = 'CodeNarc' // Set the 'title' property of the (XML) Report
+	}
+	MyHtmlReport('html') {
+		// Report type is 'html'
+		outputFile = 'target/test-reports/CodeNarcReport.html'
+		title = 'CodeNarc HTML'
 	}
 }
+//</editor-fold>

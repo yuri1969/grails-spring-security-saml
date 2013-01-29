@@ -61,9 +61,9 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					user = saveUser(user.class, user, authorities)
 
 					//TODO move to function
-//					Map whereClause = [:]
-//					whereClause.put "user", user
-//					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
+					//					Map whereClause = [:]
+					//					whereClause.put "user", user
+					//					Class<?> UserRoleClass = grailsApplication.getDomainClass(authorityJoinClassName)?.clazz
 					user.withTransaction {
 
 						def auths = user."$authoritiesPropertyName"
@@ -73,8 +73,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 						}
 					}
-				}
-				else {
+				} else {
 					grantedAuthorities = authorities
 				}
 
@@ -178,7 +177,6 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	}
 
 	protected def saveUser(userClazz, user, authorities) {
-		println "called save user println"
 		log.debug "Called Save User: "
 		log.debug user
 
@@ -190,17 +188,19 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 			userClazz.withTransaction {
 				def existingUser = userClazz.findWhere(whereClause)
-				if (!existingUser) {
-					log.debug "No existing user trying to save."
-					user.save(failOnError: true)
-				} else {
+
+				if (existingUser) {
 					user = updateUserProperties(existingUser, user)
 
 					if (samlAutoAssignAuthorities) {
 						joinClass.removeAll user
 					}
 					user.save()
+				} else {
+					log.debug "No existing user trying to save."
+					user.save(failOnError: true)
 				}
+
 				if (samlAutoAssignAuthorities) {
 					authorities.each { grantedAuthority ->
 						def role = getRole(grantedAuthority."${authorityNameField}")
