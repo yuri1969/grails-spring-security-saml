@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.reachlocal</groupId>
   <artifactId>grails-spring-security-saml</artifactId>
-  <version />
+  <version>1.0.0.M17-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>grails-spring-security-saml</name>
   <build>
