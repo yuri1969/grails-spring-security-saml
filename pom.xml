@@ -1,0 +1,15 @@
+<project xmlns='http://maven.apache.org/POM/4.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd'>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.reachlocal</groupId>
+  <artifactId>grails-spring-security-saml</artifactId>
+  <version />
+  <packaging>pom</packaging>
+  <name>grails-spring-security-saml</name>
+  <build>
+    <sourceDirectory>src/groovy,src/java,grails-app/controllers,grails-app/services,grails-app/utils,grails-app/domain,grails-app/taglib</sourceDirectory>
+  </build>
+  <properties>
+    <sonar.language>grvy</sonar.language>
+    <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+  </properties>
+</project>
