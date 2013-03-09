@@ -8,6 +8,7 @@ grails-spring-security-saml-*.zip
 grails-spring-security-saml-*.zip.*
 spring-security-saml-*-plugin.xml
 spring-security-saml-*.pom
+pom.xml.sha1
 .DS_Store
 web-app/
 *.iws
