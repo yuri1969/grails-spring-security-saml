@@ -7,6 +7,42 @@
   <name>grails-spring-security-saml</name>
   <build>
     <sourceDirectory>src/groovy,src/java,grails-app/controllers,grails-app/services,grails-app/utils,grails-app/domain,grails-app/taglib</sourceDirectory>
+
+    <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+                <excludes>
+                    <exclude>**/*.*</exclude>
+                </excludes>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>add-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                    <goal>add-source</goal>
+                </goals>
+                <configuration>
+                    <sources>
+                        <source>src/groovy</source>
+                        <source>src/java</source>
+                    </sources>
+                </configuration>
+              </execution>
+            </executions>
+         </plugin>
+      </plugins>
+
+
   </build>
   <properties>
     <sonar.language>grvy</sonar.language>
