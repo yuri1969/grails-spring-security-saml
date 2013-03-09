@@ -47,8 +47,8 @@
   <properties>
     <sonar.language>grvy</sonar.language>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.surefire.reportsPath>test/reports</sonar.surefire.reportsPath>
-    <sonar.cobertura.reportPath>test/reports/cobertura/coverage.xml</sonar.cobertura.reportPath>
+    <sonar.surefire.reportsPath>target/test-reports</sonar.surefire.reportsPath>
+    <sonar.cobertura.reportPath>target/test-reports/cobertura/coverage.xml</sonar.cobertura.reportPath>
     <sonar.phase>generate-sources</sonar.phase>
 
   </properties>
