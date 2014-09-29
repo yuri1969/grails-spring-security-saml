@@ -1,10 +1,8 @@
 package es.salenda.grails.plugins.springsecurity.saml
 
-import grails.plugin.spock.IntegrationSpec
+import spock.lang.Specification
 import test.TestUserRole
 import test.TestSamlUser
-import spock.lang.Ignore
-import grails.test.mixin.TestFor
 import test.TestRole
 import org.springframework.security.saml.SAMLCredential
 import org.opensaml.saml2.core.impl.NameIDImpl
@@ -12,7 +10,7 @@ import org.opensaml.saml2.core.impl.AssertionImpl
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
 
-class SpringSamlUserDetailsServiceSpec extends IntegrationSpec {
+class SpringSamlUserDetailsServiceIntegrationSpec extends Specification {
 
 	String username = "jackSparrow"
 

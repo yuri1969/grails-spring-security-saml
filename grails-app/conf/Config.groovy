@@ -1,6 +1,16 @@
 // configuration for plugin testing - will not be included in the plugin zip
 
 log4j = {
+
+    def datePattern = ["development", "test"].contains(grails.util.Environment.currentEnvironment.name) ? "" : "yyyy-MM-dd " // no need for date info when running locally
+    def logPattern = pattern(conversionPattern:"%d{${datePattern}HH:mm:ss.SSS} %5p {%X{loggingId}} <%X{user}> [%X{hub} %X{device}] (%t) %c{2} - %m%n")
+
+    console name:'stdout', layout:logPattern
+
+    root {
+        error 'stdout'
+    }
+
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
@@ -12,6 +22,7 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
 }
 
 grails {

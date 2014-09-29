@@ -2,7 +2,7 @@ package es.salenda.grails.plugins.springsecurity.saml
 
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 import test.TestRole
 import test.TestSamlUser

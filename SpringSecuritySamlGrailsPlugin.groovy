@@ -1,9 +1,9 @@
 import org.codehaus.groovy.grails.compiler.GrailsClassLoader;
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SecurityFilterPosition
 
 import org.springframework.core.io.ClassPathResource;
-import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAuthenticationFailureHandler
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
 import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
@@ -51,7 +51,7 @@ class SpringSecuritySamlGrailsPlugin {
     // the plugin version
     def version = "1.0.0.M20"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3 > *"
+    def grailsVersion = "2.3 > *"
     // the other plugins this plugin depends on
     def dependsOn = ['springSecurityCore' : '1.2 > *']
     // resources that are excluded from plugin packaging
