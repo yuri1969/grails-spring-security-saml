@@ -1,4 +1,3 @@
-import org.codehaus.groovy.grails.compiler.GrailsClassLoader;
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.SecurityFilterPosition
 

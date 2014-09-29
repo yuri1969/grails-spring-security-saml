@@ -44,7 +44,7 @@ class TestUserRole implements Serializable {
 	}
 
 	static TestUserRole create(TestSamlUser user, TestRole role, boolean flush = false) {
-		new TestUserRole(user: user, role: role).save(flush: flush, insert: true)
+		new TestUserRole(user: user, role: role).save(flush: flush, insert: true,failOnError: true)
 	}
 
 	static boolean remove(TestSamlUser user, TestRole role, boolean flush = false) {

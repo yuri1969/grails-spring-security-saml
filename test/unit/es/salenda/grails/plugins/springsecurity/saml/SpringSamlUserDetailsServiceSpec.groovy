@@ -9,6 +9,7 @@ import org.opensaml.saml2.core.impl.NameIDImpl
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 import test.TestRole
 import test.TestSamlUser
 import test.TestUserRole
@@ -153,7 +154,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
         samlUser.firstName == firstname
     }
 
-
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should not persist a user that already exists"() {
         given:
         service.samlAutoCreateActive = true
@@ -192,6 +193,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
 
     }
 
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should persist the role for a new user"() {
         given:
         testRole.save()
@@ -217,6 +219,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
         userDetail
     }
 
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should update the roles for an existing user"() {
         given:
         testRole.save()
@@ -250,6 +253,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
     }
 
 
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should  not update the roles for an existing user"() {
         given:
         testRole.save()
@@ -262,7 +266,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
 
         when:
         def user = new TestSamlUser(username: username, password: 'test')
-        user.save()
+        user.save(failOnError: true)
 
         def removedExistingRoles = false
         TestUserRole.metaClass.'static'.removeAll = { TestSamlUser userWithRoles ->
@@ -283,32 +287,31 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
         !savedNewRoles
     }
 
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should still pull details from DB"() {
         given:
         testRole.save()
         testRole2.save()
-
-
-
         service.samlAutoCreateActive = true
         service.samlAutoAssignAuthorities = false
         service.samlAutoCreateKey = 'username'
 
+        and:
         setMockSamlAttributes(credential, ["$GROUP_ATTR_NAME": "something=something,CN=myGroup", "$USERNAME_ATTR_NAME": username])
 
         when:
         def user = new TestSamlUser(username: username, password: 'test')
-        user.save()
+        user.save(failOnError: true)
 
         TestUserRole.create(user, testRole2)
 
-
+        and:
         def removedExistingRoles = false
         TestUserRole.metaClass.'static'.removeAll = { TestSamlUser userWithRoles ->
             assert userWithRoles.username == user.username
             removedExistingRoles = true
         }
-
+        and:
         def savedNewRoles = false
         TestUserRole.metaClass.'static'.create = { TestSamlUser userWithNoRoles, TestRole role ->
             assert userWithNoRoles.username == user.username
@@ -330,7 +333,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
 
     }
 
-
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should set any mapped fields for a user"() {
         given:
         def emailAddress = "test@mailinator.com"
@@ -355,6 +358,7 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
         updatedUser.firstName == firstname
     }
 
+    @ConfineMetaClassChanges(TestUserRole)
     void "loadUserBySAML should update mapped fields for a user"() {
         given:
         def intialEmail = 'myfirstmail@mailinator.com'
