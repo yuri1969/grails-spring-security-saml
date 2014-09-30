@@ -24,14 +24,13 @@ grails.project.dependency.resolution = {
         test ":code-coverage:1.2.5"
 
         compile(":build-test-data:2.2.1",
-
                 ":spring-security-core:2.0-RC4") {
             export = false
         }
 
         build(":tomcat:7.0.54",
                 ":hibernate:3.6.10.17",
-                ":release:2.0.4") {
+                ":release:3.0.1") {
             export = false
         }
     }
