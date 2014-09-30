@@ -1,23 +1,17 @@
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
-//grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.release.scm.enabled = false
 
 grails.project.dependency.resolution = {
     inherits('global') {
-//        excludes "xml-apis"
     }
     log 'warn'
 
     repositories {
-        grailsPlugins()
         grailsCentral()
-//        mavenRepo "https://build.shibboleth.net/nexus/content/repositories/releases"
-//        mavenRepo "https://build.shibboleth.net/nexus/content/groups/public/"
         mavenCentral()
-//        mavenRepo "http://repo.spring.io/list/release/org/springframework/security/extensions/"
     }
 
     dependencies {
