@@ -63,38 +63,36 @@ class UnitTestUtils {
 		   return null
 	   }
    }
-   
-   
-   static void setMockSamlAttributes(credential, attributes=[:]) {
-	   credential.metaClass.getAttribute = { String name ->
-		   if ( name == USERNAME_ATTR_NAME) {
-			   return [attributeValues: [
-					   [value: attributes.get("${USERNAME_ATTR_NAME}")]
-				   ]
-			   ]
-		   }
-		   else if (name == MAIL_ATTR_NAME) {
-			   return [attributeValues: [
-					   [value: attributes.get("${MAIL_ATTR_NAME}")]
-				   ]
-			   ]
-		   }
-		   else if (name == FIRSTNAME_ATTR_NAME) {
-				return [attributeValues: [
-						   [value: attributes.get("${FIRSTNAME_ATTR_NAME}")]
-					   ]
-				   ]
-			}
-		   else if (name == GROUP_ATTR_NAME) {
-			   return [
-				   [attributeValues: [
-						   [value: attributes.get("${GROUP_ATTR_NAME}")]
-					   ]
-				   ]
-			   ]
-		   }
 
-		   return []
+   private static def getAttr(def attributes, String name) {
+	   if ( name == USERNAME_ATTR_NAME) {
+		   return attributes.get("${USERNAME_ATTR_NAME}")
+	   }
+	   else if (name == MAIL_ATTR_NAME) {
+		   return attributes.get("${MAIL_ATTR_NAME}")
+	   }
+	   else if (name == FIRSTNAME_ATTR_NAME) {
+			return attributes.get("${FIRSTNAME_ATTR_NAME}")
+		}
+	   else if (name == GROUP_ATTR_NAME) {
+		   return attributes.get("${GROUP_ATTR_NAME}")
+	   }
+
+	   return null
+   }
+
+   static void setMockSamlAttributes(credential, attributes=[:]) {
+	   // getAttributeAsString() and getAttributeAsStringArray() have to be mocked
+	   //   directly, even if they use getAttribute() under the hood
+	   credential.metaClass.getAttributeAsString = { String name ->
+		   getAttr(attributes, name)
+	   }
+	   credential.metaClass.getAttributeAsStringArray = { String name ->
+			def val = getAttr(attributes, name)
+
+			if (val == null)
+				return null
+			val.tokenize(',') // here we assume attributes are stored as comma-separated strings!
 	   }
    }
 }
