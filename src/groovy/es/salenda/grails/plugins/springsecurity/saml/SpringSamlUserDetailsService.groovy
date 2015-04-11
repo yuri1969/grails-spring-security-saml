@@ -121,6 +121,9 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 				authorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))
 			}
 		}
+		if ( authorities.size() == 0 ) {
+			authorities.add(GormUserDetailsService.NO_ROLE)
+		}
 
 		return authorities
 	}
