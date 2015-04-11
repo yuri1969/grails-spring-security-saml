@@ -66,14 +66,14 @@ class MetadataController {
 	def save = {
 
 		metadataGenerator.setEntityId(params.entityId)
-		metadataGenerator.setEntityAlias(params.alias)
+		//metadataGenerator.setEntityAlias(params.alias)
 		metadataGenerator.setEntityBaseURL(params.baseURL)
-		metadataGenerator.setSignMetadata(params.signMetadata as boolean)
+		//metadataGenerator.setSignMetadata(params.signMetadata as boolean)
 		metadataGenerator.setRequestSigned(params.requestSigned as boolean)
 		metadataGenerator.setWantAssertionSigned(params.wantAssertionSigned as boolean)
-		metadataGenerator.setSigningKey(params.signingKey)
-		metadataGenerator.setEncryptionKey(params.encryptionKey)
-		metadataGenerator.setTlsKey(params.tlsKey)
+		//metadataGenerator.setSigningKey(params.signingKey)
+		//metadataGenerator.setEncryptionKey(params.encryptionKey)
+		//metadataGenerator.setTlsKey(params.tlsKey)
 
 
 		//<editor-fold desc="SSO Bindings">
@@ -115,7 +115,7 @@ class MetadataController {
 		metadataGenerator.setBindingsHoKSSO(bindingsHoKSSO)
 		//</editor-fold>
 
-		metadataGenerator.setIncludeDiscovery(params.includeDiscovery as boolean)
+		metadataGenerator.setIncludeDiscoveryExtension(params.includeDiscovery as boolean)
 
 		def descriptor = metadataGenerator.generateMetadata()
 
@@ -124,6 +124,14 @@ class MetadataController {
 		extendedMetadata.setRequireLogoutRequestSigned(params.requireLogoutRequestSigned as boolean)
 		extendedMetadata.setRequireLogoutResponseSigned(params.requireLogoutResponseSigned as boolean)
 		extendedMetadata.setRequireArtifactResolveSigned(params.requireArtifactResolveSigned as boolean)
+
+		// fields moved from MetadataGenerator to ExtendedMetadata since Spring SAML 1.0 RC2
+		extendedMetadata.setAlias(params.alias)
+		extendedMetadata.setSignMetadata(params.signMetadata as boolean)
+		extendedMetadata.setSigningKey(params.signingKey)
+		extendedMetadata.setEncryptionKey(params.encryptionKey)
+		extendedMetadata.setTlsKey(params.tlsKey)
+		extendedMetadata.setIdpDiscoveryEnabled(metadataGenerator.isIncludeDiscoveryExtension())
 
 		if (params.store) {
 			MetadataMemoryProvider memoryProvider = new MetadataMemoryProvider(descriptor)

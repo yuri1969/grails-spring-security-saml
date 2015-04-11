@@ -88,7 +88,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 		if (samlUserAttributeMappings?.username) {
 
-			def attribute = credential.getAttributeByName(samlUserAttributeMappings.username)
+			def attribute = credential.getAttribute(samlUserAttributeMappings.username)
 			def value = attribute?.attributeValues?.value
 			return value?.first()
 		} else {
@@ -99,7 +99,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 	protected Object mapAdditionalAttributes(credential, user) {
 		samlUserAttributeMappings.each { key, value ->
-			def attribute = credential.getAttributeByName(value)
+			def attribute = credential.getAttribute(value)
 			def samlValue = attribute?.attributeValues?.value
 			if (samlValue) {
 				user."$key" = samlValue?.first()
@@ -139,7 +139,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		def userGroups = []
 
 		if (samlUserGroupAttribute) {
-			def attributes = credential.getAttributeByName(samlUserGroupAttribute)
+			def attributes = credential.getAttribute(samlUserGroupAttribute)
 
 			attributes.each { attribute ->
 				attribute.attributeValues?.each { attributeValue ->

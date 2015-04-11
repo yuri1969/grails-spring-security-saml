@@ -66,7 +66,7 @@ class UnitTestUtils {
    
    
    static void setMockSamlAttributes(credential, attributes=[:]) {
-	   credential.metaClass.getAttributeByName = { String name ->
+	   credential.metaClass.getAttribute = { String name ->
 		   if ( name == USERNAME_ATTR_NAME) {
 			   return [attributeValues: [
 					   [value: attributes.get("${USERNAME_ATTR_NAME}")]
