@@ -1,25 +1,28 @@
+
 package es.salenda.grails.plugins.springsecurity.saml
 
+import grails.plugin.springsecurity.userdetails.GormUserDetailsService;
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.opensaml.saml2.core.impl.AssertionImpl
 import org.opensaml.saml2.core.impl.NameIDImpl
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
+
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 import test.TestRole
 import test.TestSamlUser
 import test.TestUserRole
-
 import static es.salenda.grails.plugins.springsecurity.saml.UnitTestUtils.*
 
 @TestFor(SpringSamlUserDetailsService)
 @Mock([TestSamlUser, TestRole, TestUserRole])
 class SpringSamlUserDetailsServiceSpec extends Specification {
-    def credential, nameID, assertion, mockGrailsAplication, testRole, testRole2
+    def credential, nameID, assertion, mockGrailsAplication, testRole, testRole2, testNoRole
     def service
 
     String username = "jackSparrow"
@@ -54,6 +57,10 @@ class SpringSamlUserDetailsServiceSpec extends Specification {
 
         testRole = new TestRole(authority: ROLE)
         testRole2 = new TestRole(authority: "FAKEROLE2")
+
+        // Persistent NO_ROLE is needed if no authorities are granted
+        testNoRole = new TestRole(authority: GormUserDetailsService.NO_ROLE)
+        testNoRole.save()
 
         // set default username to be returned in the saml response
         setMockSamlAttributes(credential, ["$USERNAME_ATTR_NAME": username])
