@@ -17,7 +17,7 @@ package es.salenda.grails.plugins.springsecurity.saml
 import grails.plugin.springsecurity.userdetails.GormUserDetailsService
 import org.springframework.beans.BeanUtils
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.GrantedAuthorityImpl
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.saml.SAMLCredential
 import org.springframework.security.saml.userdetails.SAMLUserDetailsService
@@ -46,17 +46,20 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 		if (credential) {
 			String username = getSamlUsername(credential)
+			
 			if (!username) {
 				throw new UsernameNotFoundException("No username supplied in saml response.")
 			}
 
 			def user = generateSecurityUser(username)
 			user = mapAdditionalAttributes(credential, user)
+
 			if (user) {
 				log.debug "Loading database roles for $username..."
 				def authorities = getAuthoritiesForUser(credential)
 
 				def grantedAuthorities = []
+
 				if (samlAutoCreateActive) {
 					user = saveUser(user.class, user, authorities)
 
@@ -68,8 +71,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 						def auths = UserRoleClass.findAllWhere(whereClause).collect { it.role }
 
 						auths.each { authority ->
-							grantedAuthorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))
-
+							grantedAuthorities.add(new SimpleGrantedAuthority(authority."$authorityNameField"))
 						}
 					}
 				}
@@ -84,10 +86,17 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		}
 	}
 
+	/**
+	 * 
+	 * Obtain username of logged user from SAML message. 
+	 * 
+	 * When the samlUserAttributeMappings contains key 'username' - use the SAML Attribute value. Otherwise use 'saml2:NameID' value.
+	 * 
+	 * @param credential
+	 * @return
+	 */
 	protected String getSamlUsername(credential) {
-
 		if (samlUserAttributeMappings?.username) {
-
 			return credential.getAttributeAsString(samlUserAttributeMappings.username)
 		} else {
 			// if no mapping provided for username attribute then assume it is the returned subject in the assertion
@@ -95,15 +104,27 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		}
 	}
 
+	/**
+	 * 
+	 * Assign obtained SAML Attributes to the Spring Security user domain class fields. 
+	 * 
+	 * Keys in samlUserAttributeMappings are equal to fields in the user domain class. Values in the map are equal to 'Name' attributes in 'saml2:Attribute'.
+	 * 
+	 * @param credential
+	 * @param user
+	 * @return
+	 */
 	protected Object mapAdditionalAttributes(credential, user) {
 		samlUserAttributeMappings.each { key, value ->
 			// Note that check "user."$key" instanceof String" will fail when field value is null.
 			//  Instead, we have to check field type
 			Class keyType = grailsApplication.getDomainClass(userDomainClassName).properties.find { prop -> prop.name == "$key" }.type
+			
 			if (keyType != null && (keyType.isArray() || Collection.class.isAssignableFrom(keyType))) {
 				def attributes = credential.getAttributeAsStringArray(value)
+				
 				attributes?.each() { attrValue ->
-					if (! user."$key") {
+					if (!user."$key") {
 						user."$key" = []
 					}
 					user."$key" << attrValue
@@ -113,22 +134,28 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 				user."$key" = attrValue
 			}
 		}
-		user
+		
+		return user
 	}
 
 	protected Collection<GrantedAuthority> getAuthoritiesForUser(SAMLCredential credential) {
-		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthorityImpl>()
+		Set<GrantedAuthority> authorities = new HashSet<SimpleGrantedAuthority>()
 
 		def samlGroups = getSamlGroups(credential)
 
 		samlGroups.each { groupName ->
+			log.debug "Getting authorities for group '$groupName'..."
+
+			// get mapped role from parsed incoming group
 			def role = samlUserGroupToRoleMapping.get(groupName)
 			def authority = getRole(role)
 
 			if (authority) {
-				authorities.add(new GrantedAuthorityImpl(authority."$authorityNameField"))
+				authorities.add(new SimpleGrantedAuthority(authority."$authorityNameField"))
 			}
 		}
+
+		// add a filler to empty authorities
 		if ( authorities.size() == 0 ) {
 			authorities.add(GormUserDetailsService.NO_ROLE)
 		}
@@ -153,7 +180,8 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			def attributeValues = credential.getAttributeAsStringArray(samlUserGroupAttribute)
 			attributeValues.each { groupString ->
 				def groupStringValue = groupString
-				if ( groupString.startsWith("CN") ) {
+
+				if (groupString.startsWith("CN")) {
 					groupString?.tokenize(',').each { token ->
 						def keyValuePair = token.tokenize('=')
 						if (keyValuePair.first() == 'CN') {
@@ -166,16 +194,18 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 		}
 
-		userGroups
+		return userGroups
 	}
 
 	private Object generateSecurityUser(username) {
 		if (userDomainClassName) {
 			Class<?> UserClass = grailsApplication.getDomainClass(userDomainClassName)?.clazz
+			
 			if (UserClass) {
 				def user = BeanUtils.instantiateClass(UserClass)
 				user.username = username
 				user.password = "password"
+				
 				return user
 			} else {
 				throw new ClassNotFoundException("domain class ${userDomainClassName} not found")
@@ -197,9 +227,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 				if (!existingUser) {
 					if (!user.save()) {
 						def save_errors=""
-						user.errors.each {
-							save_errors+=it
-						}
+						user.errors.each { save_errors+=it }
 						throw new UsernameNotFoundException("Could not save user ${user} - ${save_errors}");
 					}
 				} else {
@@ -219,6 +247,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 			}
 		}
+		
 		return user
 	}
 
@@ -226,11 +255,21 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 		samlUserAttributeMappings.each { key, value ->
 			existingUser."$key" = user."$key"
 		}
+		
 		return existingUser
 	}
 
+	/**
+	 * 
+	 * Create role object containing proper authority.
+	 * 
+	 * @param authority
+	 * @return
+	 */
 	private Object getRole(String authority) {
 		if (authority && authorityNameField && authorityClassName) {
+			log.debug "Setting authority '$authority' for role domain class '$authorityClassName' with field '$authorityNameField'..."
+
 			Class<?> Role = grailsApplication.getDomainClass(authorityClassName).clazz
 			if (Role) {
 				Map whereClause = [:]

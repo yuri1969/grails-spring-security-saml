@@ -30,17 +30,18 @@ class SamlSecurityService extends SpringSecurityService {
 
 	Object getCurrentUser() {
 		def userDetails
+		
 		if (!isLoggedIn()) {
 			userDetails = null
 		} else {
 			userDetails = getAuthentication().details
-			if ( config?.saml.autoCreate.active ) { 
+			if (config?.saml.autoCreate.active) {
 				userDetails =  getCurrentPersistedUser(userDetails)
 			}
 		}
 		return userDetails
 	}
-	
+
 	private Object getCurrentPersistedUser(userDetails) {
 		if (userDetails) {
 			String className = config?.userLookup.userDomainClassName
@@ -49,6 +50,8 @@ class SamlSecurityService extends SpringSecurityService {
 				Class<?> userClass = grailsApplication.getDomainClass(className)?.clazz
 				return userClass."findBy${userKey.capitalize()}"(userDetails."$userKey")
 			}
-		} else { return null}
+		} else {
+			return null
+		}
 	}
 }
