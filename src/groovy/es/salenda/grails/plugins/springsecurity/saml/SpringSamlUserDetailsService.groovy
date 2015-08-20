@@ -46,7 +46,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 		if (credential) {
 			String username = getSamlUsername(credential)
-			
+
 			if (!username) {
 				throw new UsernameNotFoundException("No username supplied in saml response.")
 			}
@@ -81,7 +81,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 				return createUserDetails(user, grantedAuthorities)
 			} else {
-				throw new InstantiationException('could not instantiate new user')
+				throw new InstantiationException("Could not instantiate new user $user")
 			}
 		}
 	}
@@ -116,13 +116,15 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	 */
 	protected Object mapAdditionalAttributes(credential, user) {
 		samlUserAttributeMappings.each { key, value ->
+			log.debug "Adding user attribute $key with value $value..."
+
 			// Note that check "user."$key" instanceof String" will fail when field value is null.
 			//  Instead, we have to check field type
 			Class keyType = grailsApplication.getDomainClass(userDomainClassName).properties.find { prop -> prop.name == "$key" }.type
-			
+
 			if (keyType != null && (keyType.isArray() || Collection.class.isAssignableFrom(keyType))) {
 				def attributes = credential.getAttributeAsStringArray(value)
-				
+
 				attributes?.each() { attrValue ->
 					if (!user."$key") {
 						user."$key" = []
@@ -134,7 +136,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 				user."$key" = attrValue
 			}
 		}
-		
+
 		return user
 	}
 
@@ -168,7 +170,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	 * Expects the saml.userGroupAttribute to specify the saml assertion attribute that holds 
 	 * returned group membership data.
 	 *
-	 * Expects the group strings to be of the format "CN=groupName,someOtherParam=someOtherValue"
+	 * Expects the group strings to be of the LDAP format "CN=groupName,someOtherParam=someOtherValue" or just plain "groupName,otherGroupName"
 	 *
 	 * @param credential
 	 * @return list of groups
@@ -181,15 +183,21 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			attributeValues.each { groupString ->
 				def groupStringValue = groupString
 
+				// LDAP results starts with 'CN'
 				if (groupString.startsWith("CN")) {
 					groupString?.tokenize(',').each { token ->
 						def keyValuePair = token.tokenize('=')
 						if (keyValuePair.first() == 'CN') {
 							groupStringValue = keyValuePair.last()
 						}
+						log.debug "Adding LDAP group $token..."
 					}
+
+					userGroups << groupStringValue
+				}else {
+					// non-LDAP results
+					groupString?.tokenize(',').each { token -> userGroups << token }
 				}
-				userGroups << groupStringValue
 			}
 
 		}
@@ -200,12 +208,12 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	private Object generateSecurityUser(username) {
 		if (userDomainClassName) {
 			Class<?> UserClass = grailsApplication.getDomainClass(userDomainClassName)?.clazz
-			
+
 			if (UserClass) {
 				def user = BeanUtils.instantiateClass(UserClass)
 				user.username = username
 				user.password = "password"
-				
+
 				return user
 			} else {
 				throw new ClassNotFoundException("domain class ${userDomainClassName} not found")
@@ -217,6 +225,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 	private def saveUser(userClazz, user, authorities) {
 		if (userClazz && samlAutoCreateActive && samlAutoCreateKey && authorityNameField && authorityJoinClassName) {
+			log.debug "Saving user $user..."
 
 			Map whereClause = [:]
 			whereClause.put "$samlAutoCreateKey".toString(), user."$samlAutoCreateKey"
@@ -224,10 +233,11 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 			userClazz.withTransaction {
 				def existingUser = userClazz.findWhere(whereClause)
+
 				if (!existingUser) {
-					if (!user.save()) {
+					if (!user.save(flush: true)) {
 						def save_errors=""
-						user.errors.each { save_errors+=it }
+						user.errors.each { save_errors += it }
 						throw new UsernameNotFoundException("Could not save user ${user} - ${save_errors}");
 					}
 				} else {
@@ -236,9 +246,12 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					if (samlAutoAssignAuthorities) {
 						joinClass.removeAll user
 					}
-					user.save()
+					user.save(flush: true)
 				}
+
 				if (samlAutoAssignAuthorities) {
+					log.debug "Adding authorities.."
+
 					authorities.each { grantedAuthority ->
 						def role = getRole(grantedAuthority."${authorityNameField}")
 						joinClass.create(user, role)
@@ -247,15 +260,16 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 			}
 		}
-		
+
 		return user
 	}
 
 	private Object updateUserProperties(existingUser, user) {
+		log.debug "Updating existing user's $existingUser properties..."
 		samlUserAttributeMappings.each { key, value ->
 			existingUser."$key" = user."$key"
 		}
-		
+
 		return existingUser
 	}
 
@@ -267,17 +281,25 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	 * @return
 	 */
 	private Object getRole(String authority) {
+		def role = null
+
 		if (authority && authorityNameField && authorityClassName) {
 			log.debug "Setting authority '$authority' for role domain class '$authorityClassName' with field '$authorityNameField'..."
 
-			Class<?> Role = grailsApplication.getDomainClass(authorityClassName).clazz
-			if (Role) {
-				Map whereClause = [:]
-				whereClause.put "$authorityNameField".toString(), authority
-				Role.findWhere(whereClause)
+			Class<?> roleClass = grailsApplication.getDomainClass(authorityClassName).clazz
+			if (roleClass) {
+				roleClass.withTransaction {
+					Map whereClause = [:]
+					whereClause.put "$authorityNameField".toString(), authority
+					role = roleClass.findWhere(whereClause)
+
+					log.debug "Found role: $role"
+				}
 			} else {
 				throw new ClassNotFoundException("domain class ${authorityClassName} not found")
 			}
 		}
+
+		return role
 	}
 }
