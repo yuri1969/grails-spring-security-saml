@@ -45,6 +45,7 @@ import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider
 import org.opensaml.xml.parse.BasicParserPool
 
 import org.apache.commons.httpclient.HttpClient
+import org.codehaus.groovy.grails.commons.GrailsApplication;
 
 class SpringSecuritySamlGrailsPlugin {
     // the plugin version
@@ -54,12 +55,14 @@ class SpringSecuritySamlGrailsPlugin {
     // the other plugins this plugin depends on
     def dependsOn = ['springSecurityCore' : '2.0 > *']
     // resources that are excluded from plugin packaging
-    def pluginExcludes = [
+    List pluginExcludes = [
 		'grails-app/domain/**',
         "grails-app/views/error.gsp",
 		'docs/**',
 		'scripts/PublishGithub.groovy'
     ]
+	
+	List loadAfter = ['springSecurityCore']
 
     // TODO Fill in these fields
     def title = "SAML 2.x support for the Spring Security Plugin" // Headline display name of the plugin
@@ -118,6 +121,9 @@ SAML 2.x support for the Spring Security Plugin
 		SpringSecurityUtils.registerFilter 'samlProcessingFilter', SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 3
 		SpringSecurityUtils.registerFilter 'samlLogoutFilter', SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 4
 		SpringSecurityUtils.registerFilter 'samlLogoutProcessingFilter', SecurityFilterPosition.SECURITY_CONTEXT_FILTER.order + 5
+		
+		// Set the enabled flag
+		es.salenda.grails.plugins.springsecurity.saml.MetadataFilters.generatorEnabled = conf.saml.metadata.generatorEnabled
 		
 		successRedirectHandler(SavedRequestAwareAuthenticationSuccessHandler) {
 			alwaysUseDefaultTargetUrl = conf.saml.alwaysUseAfterLoginUrl ?: false

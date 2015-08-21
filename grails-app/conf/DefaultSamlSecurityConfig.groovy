@@ -30,6 +30,7 @@ security {
 			assignAuthorities = true // Assign the authorities that come from the SAML message.
 		}
 		metadata {
+			generatorEnabled = false // enable metadata GUI generator
 			defaultIdp = 'ping' // Default IdP provider
 			url = '/saml/metadata'
 			providers = [ ping :'security/idp-local.xml'] // Providers and path to their metadata file
