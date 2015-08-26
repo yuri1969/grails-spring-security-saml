@@ -7,7 +7,7 @@
 	<body>
 		<div style="margin-left: 20px;">
 			<h1>Metadata - ${extendedMetadata.alias?:entityDescriptor.entityID}</h1>
-			<p><a href="${request.contextPath}${grailsApplication.config.grails.plugins.springsecurity.saml.metadata.url}/${extendedMetadata.alias?'alias/'+extendedMetadata.alias:''}">Download Metadata</a></p>
+			<p><a href="${request.contextPath}${grailsApplication.config.grails.plugin.springsecurity.saml.metadata.url}/${extendedMetadata.alias?'alias/'+extendedMetadata.alias:''}">Download Metadata</a></p>
 			<br/>
 			<h2>Properties</h2>
 			<ul>
@@ -34,22 +34,20 @@
 	                </li>
 	                <li>Make sure to update your identity provider(s) with the generated metadata.</li>
 	                <li>
-						Update your Config.groovy and add the following lines:
-						<code>
-							grails.plugins.springsecurity.saml.metadata.sp.file = 'security/${storagePath}'
-						</code>
-						<code>
-						grails.plugins.springsecurity.saml.metadata.sp.defaults = [
-					local: true, 
-					alias: 'test',
-					securityProfile: 'metaiop',
-					signingKey: 'ping',
-					encryptionKey: 'ping', 
-					tlsKey: 'ping',
-					requireArtifactResolveSigned: false,
-					requireLogoutRequestSigned: false, 
-					requireLogoutResponseSigned: false ]
-						</code>
+						Update your config file and add the following directives:
+						<pre>
+							grails.plugin.springsecurity.saml.metadata.sp.file = 'security/${storagePath}'
+							grails.plugin.springsecurity.saml.metadata.sp.defaults = [
+								local: true, 
+								alias: '${extendedMetadata.alias}',
+								securityProfile: '${extendedMetadata.securityProfile?:'metaiop'}',
+								signingKey: '${extendedMetadata.signingKey}',
+								encryptionKey: '${extendedMetadata.encryptionKey}', 
+								tlsKey: '${extendedMetadata.tlsKey}',
+								requireArtifactResolveSigned: ${extendedMetadata.requireLogoutRequestSigned},
+								requireLogoutRequestSigned: ${extendedMetadata.requireLogoutResponseSigned}, 
+								requireLogoutResponseSigned: ${extendedMetadata.requireArtifactResolveSigned} ]
+						</pre>
 	                </li>
 	            </ol>			
 			</g:if>

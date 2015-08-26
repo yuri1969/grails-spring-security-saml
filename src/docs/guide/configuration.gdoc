@@ -4,9 +4,9 @@ h1. Configuration options for the plugin
 grails-app/conf/Config.groovy
 
 {note}
-Any property overrides must be specified in @grails-app/conf/Config.groovy@ using the @grails.plugins.springsecurity@ suffix, for example
+Any property overrides must be specified in @grails-app/conf/Config.groovy@ using the @grails.plugin.springsecurity@ suffix, for example
 {code}
-grails.plugins.springsecurity.saml.active = true
+grails.plugin.springsecurity.saml.active = true
 {code}
 {note}
 

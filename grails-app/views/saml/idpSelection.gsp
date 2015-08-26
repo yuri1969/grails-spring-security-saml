@@ -8,7 +8,7 @@
 		<g:applyLayout name="main">
 		<h1>IDP selection</h1>
 		
-		<form action="${request.contextPath}${grailsApplication.config.grails.plugins.springsecurity.auth.loginFormUrl}" method="GET">
+		<form action="${request.contextPath}${grailsApplication.config.grails.plugin.springsecurity.auth.loginFormUrl}" method="GET">
 		    <%-- We send this attribute to tell the processing filter that we want to initialize login --%>
 		    <input type="hidden" name="login" value="true"/>
 		    <table>

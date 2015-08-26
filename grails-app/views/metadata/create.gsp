@@ -95,7 +95,7 @@
 							<g:checkBox name="hokBindingPost"  checked="true"/> <label for="hokBindingPost">Post</label><br/>
 							<g:checkBox name="hokBindingArtifact" checked="true" /> <label for="hokBindingArtifact">Artifact</label><br/>
 						</td>
-					</tr
+					</tr>
 			        <tr>
 			            <td>Security profile:</td>
 			            <td>
