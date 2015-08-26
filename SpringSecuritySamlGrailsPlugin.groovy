@@ -2,7 +2,6 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.SecurityFilterPosition
 
 import org.springframework.core.io.ClassPathResource;
-import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
 import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
@@ -39,6 +38,7 @@ import es.salenda.grails.plugins.springsecurity.saml.SpringSamlUserDetailsServic
 import es.salenda.grails.plugins.springsecurity.saml.GrailsSAMLAuthenticationProvider
 import es.salenda.grails.plugins.springsecurity.saml.SamlTagLib
 import es.salenda.grails.plugins.springsecurity.saml.SamlSecurityService
+import es.salenda.grails.plugins.springsecurity.saml.CustomAjaxAwareAuthenticationFailureHandler
 
 import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider
@@ -249,7 +249,7 @@ SAML 2.x support for the Spring Security Plugin
 			authenticationFailureHandler = ref('authenticationFailureHandler')
 		}
 		
-		authenticationFailureHandler(AjaxAwareAuthenticationFailureHandler) {
+		authenticationFailureHandler(CustomAjaxAwareAuthenticationFailureHandler) {
 			redirectStrategy = ref('redirectStrategy')
 			defaultFailureUrl = conf.failureHandler.defaultFailureUrl //'/login/authfail?login_error=1'
 			useForward = conf.failureHandler.useForward // false
