@@ -55,7 +55,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			user = mapAdditionalAttributes(credential, user)
 
 			if (user) {
-				log.debug "Loading database roles for $username..."
+				log.debug "Loading database roles for '$username'..."
 				def authorities = getAuthoritiesForUser(credential)
 
 				def grantedAuthorities = []
@@ -81,7 +81,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 				return createUserDetails(user, grantedAuthorities)
 			} else {
-				throw new InstantiationException("Could not instantiate new user $user")
+				throw new InstantiationException("Could not instantiate new user '$user'")
 			}
 		}
 	}
@@ -116,7 +116,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	 */
 	protected Object mapAdditionalAttributes(credential, user) {
 		samlUserAttributeMappings.each { key, value ->
-			log.debug "Adding user attribute $key with value $value..."
+			log.debug "Adding user attribute '$key' with value '$value'..."
 
 			// Note that check "user."$key" instanceof String" will fail when field value is null.
 			//  Instead, we have to check field type
@@ -183,14 +183,14 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 			attributeValues.each { groupString ->
 				def groupStringValue = groupString
 
-				// LDAP results starts with 'CN'
-				if (groupString.startsWith("CN")) {
+				// LDAP results starts with 'CN' or 'cn'
+				if (groupString.toLowerCase().startsWith('cn')) {
 					groupString?.tokenize(',').each { token ->
 						def keyValuePair = token.tokenize('=')
-						if (keyValuePair.first() == 'CN') {
+						if (keyValuePair.first().toLowerCase() == 'cn') {
 							groupStringValue = keyValuePair.last()
 						}
-						log.debug "Adding LDAP group $token..."
+						log.debug "Adding LDAP group '$token'..."
 					}
 
 					userGroups << groupStringValue
@@ -216,7 +216,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 				return user
 			} else {
-				throw new ClassNotFoundException("domain class ${userDomainClassName} not found")
+				throw new ClassNotFoundException("domain class '${userDomainClassName}' not found")
 			}
 		} else {
 			throw new ClassNotFoundException("security user domain class undefined")
@@ -225,7 +225,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 
 	private def saveUser(userClazz, user, authorities) {
 		if (userClazz && samlAutoCreateActive && samlAutoCreateKey && authorityNameField && authorityJoinClassName) {
-			log.debug "Saving user $user..."
+			log.debug "Saving user '$user'..."
 
 			Map whereClause = [:]
 			whereClause.put "$samlAutoCreateKey".toString(), user."$samlAutoCreateKey"
@@ -238,7 +238,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					if (!user.save(flush: true)) {
 						def save_errors=""
 						user.errors.each { save_errors += it }
-						throw new UsernameNotFoundException("Could not save user ${user} - ${save_errors}");
+						throw new UsernameNotFoundException("Could not save user '${user}' - '${save_errors}'");
 					}
 				} else {
 					user = updateUserProperties(existingUser, user)
@@ -265,7 +265,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 	}
 
 	private Object updateUserProperties(existingUser, user) {
-		log.debug "Updating existing user's $existingUser properties..."
+		log.debug "Updating existing user's '$existingUser' properties..."
 		samlUserAttributeMappings.each { key, value ->
 			existingUser."$key" = user."$key"
 		}
@@ -293,7 +293,7 @@ class SpringSamlUserDetailsService extends GormUserDetailsService implements SAM
 					whereClause.put "$authorityNameField".toString(), authority
 					role = roleClass.findWhere(whereClause)
 
-					log.debug "Found role: $role"
+					log.debug "Found role: '$role'"
 				}
 			} else {
 				throw new ClassNotFoundException("domain class ${authorityClassName} not found")
